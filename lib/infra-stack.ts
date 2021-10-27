@@ -26,6 +26,7 @@ export class InfraStack extends cdk.Stack {
     });
     const container = taskDefinition.addContainer('my-container', {
       image: ecs.ContainerImage.fromAsset('./app'),
+      logging: ecs.LogDriver.awsLogs({ streamPrefix: 'my-container-log' }),
     });
     container.addPortMappings({
       containerPort: 8080,
@@ -58,7 +59,7 @@ export class InfraStack extends cdk.Stack {
       billingMode: dynamodb.BillingMode.PAY_PER_REQUEST,
     });
 
-    table.grantReadWriteData(taskRole);
+    table.grantFullAccess(taskRole);
 
     new CfnOutput(this, 'LoadBalancerDNS', {
       value: lb.loadBalancerDnsName,
