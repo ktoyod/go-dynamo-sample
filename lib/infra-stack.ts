@@ -11,6 +11,11 @@ export class InfraStack extends cdk.Stack {
   constructor(scope: cdk.Construct, id: string, props?: cdk.StackProps) {
     super(scope, id, props);
 
+    const table = new dynamodb.Table(this, 'my-table', {
+      partitionKey: { name: 'id', type: dynamodb.AttributeType.STRING },
+      billingMode: dynamodb.BillingMode.PAY_PER_REQUEST,
+    });
+
     const vpc = new ec2.Vpc(this, 'my-vpc');
 
     const taskRole = new iam.Role(this, 'my-task-role', {
@@ -27,6 +32,9 @@ export class InfraStack extends cdk.Stack {
     const container = taskDefinition.addContainer('my-container', {
       image: ecs.ContainerImage.fromAsset('./app'),
       logging: ecs.LogDriver.awsLogs({ streamPrefix: 'my-container-log' }),
+      environment: {
+        DYNAMODB_TABLE: table.tableName,
+      },
     });
     container.addPortMappings({
       containerPort: 8080,
@@ -52,11 +60,6 @@ export class InfraStack extends cdk.Stack {
       listener: ecs.ListenerConfig.applicationListener(listener, {
         protocol: elbv2.ApplicationProtocol.HTTP,
       }),
-    });
-
-    const table = new dynamodb.Table(this, 'my-table', {
-      partitionKey: { name: 'id', type: dynamodb.AttributeType.STRING },
-      billingMode: dynamodb.BillingMode.PAY_PER_REQUEST,
     });
 
     table.grantFullAccess(taskRole);
