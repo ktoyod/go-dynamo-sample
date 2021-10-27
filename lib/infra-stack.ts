@@ -1,8 +1,10 @@
 import * as cdk from '@aws-cdk/core';
 
+import * as dynamodb from '@aws-cdk/aws-dynamodb';
 import * as ec2 from '@aws-cdk/aws-ec2';
 import * as ecs from '@aws-cdk/aws-ecs';
 import * as elbv2 from '@aws-cdk/aws-elasticloadbalancingv2';
+import * as iam from '@aws-cdk/aws-iam';
 import { CfnOutput } from '@aws-cdk/core';
 
 export class InfraStack extends cdk.Stack {
@@ -11,11 +13,16 @@ export class InfraStack extends cdk.Stack {
 
     const vpc = new ec2.Vpc(this, 'my-vpc');
 
+    const taskRole = new iam.Role(this, 'my-task-role', {
+      assumedBy: new iam.ServicePrincipal('ecs-tasks.amazonaws.com'),
+    });
+
     const cluster = new ecs.Cluster(this, 'my-cluster', { vpc: vpc });
 
     const taskDefinition = new ecs.FargateTaskDefinition(this, 'my-task-def', {
       memoryLimitMiB: 512,
       cpu: 256,
+      taskRole: taskRole,
     });
     const container = taskDefinition.addContainer('my-container', {
       image: ecs.ContainerImage.fromAsset('./app'),
@@ -45,6 +52,13 @@ export class InfraStack extends cdk.Stack {
         protocol: elbv2.ApplicationProtocol.HTTP,
       }),
     });
+
+    const table = new dynamodb.Table(this, 'my-table', {
+      partitionKey: { name: 'id', type: dynamodb.AttributeType.STRING },
+      billingMode: dynamodb.BillingMode.PAY_PER_REQUEST,
+    });
+
+    table.grantReadWriteData(taskRole);
 
     new CfnOutput(this, 'LoadBalancerDNS', {
       value: lb.loadBalancerDnsName,
