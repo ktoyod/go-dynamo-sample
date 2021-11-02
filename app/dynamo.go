@@ -23,15 +23,7 @@ func GetTableInfo(c context.Context, api DynamoDBDescribeTableAPI, input *dynamo
 	return api.DescribeTable(c, input)
 }
 
-func descdynamodb(table *string) {
-	// table := flag.String("t", "", "The name of the table")
-	// flag.Parse()
-
-	if *table == "" {
-		fmt.Println("You must specify a table name (-t TABLE)")
-		return
-	}
-
+func descDynamoDB(table *string) {
 	// Use the SDK's default configuration.
 	cfg, err := config.LoadDefaultConfig(context.TODO())
 	if err != nil {
