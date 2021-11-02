@@ -30,7 +30,7 @@ export class InfraStack extends cdk.Stack {
       taskRole: taskRole,
     });
     const container = taskDefinition.addContainer('my-container', {
-      image: ecs.ContainerImage.fromAsset('./app'),
+      image: ecs.ContainerImage.fromAsset('../app'),
       logging: ecs.LogDriver.awsLogs({ streamPrefix: 'my-container-log' }),
       environment: {
         DYNAMODB_TABLE: table.tableName,
