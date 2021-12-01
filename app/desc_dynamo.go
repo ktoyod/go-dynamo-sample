@@ -1,5 +1,8 @@
 // Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
 // SPDX - License - Identifier: Apache - 2.0
+/*
+https://aws.github.io/aws-sdk-go-v2/docs/code-examples/dynamodb/describetable/
+*/
 package main
 
 import (
@@ -25,6 +28,7 @@ func GetTableInfo(c context.Context, api DynamoDBDescribeTableAPI, input *dynamo
 
 func descDynamoDB(table *string) {
 	// Use the SDK's default configuration.
+	// TODO: configurationとは？
 	cfg, err := config.LoadDefaultConfig(context.TODO())
 	if err != nil {
 		panic("unable to load SDK config, " + err.Error())

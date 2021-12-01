@@ -7,7 +7,7 @@ import * as elbv2 from '@aws-cdk/aws-elasticloadbalancingv2';
 import * as iam from '@aws-cdk/aws-iam';
 import { CfnOutput } from '@aws-cdk/core';
 
-export class InfraStack extends cdk.Stack {
+export class GoDynamoDBSampleStack extends cdk.Stack {
   constructor(scope: cdk.Construct, id: string, props?: cdk.StackProps) {
     super(scope, id, props);
 
